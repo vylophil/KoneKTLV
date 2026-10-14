@@ -12,6 +12,24 @@ class Endorsement extends Model
     /** @var list<string> */
     protected $fillable = ['endorsed_user_id', 'skill_id'];
 
+    protected static function booted(): void
+    {
+        static::saved(fn (Endorsement $endorsement) => $endorsement->refreshSkillCounts());
+        static::deleted(fn (Endorsement $endorsement) => $endorsement->refreshSkillCounts());
+    }
+
+    private function refreshSkillCounts(): void
+    {
+        foreach ([
+            [$this->getAttribute('endorsed_user_id'), $this->getAttribute('skill_id')],
+            [$this->getOriginal('endorsed_user_id'), $this->getOriginal('skill_id')],
+        ] as [$userId, $skillId]) {
+            if ((is_int($userId) || is_string($userId)) && (is_int($skillId) || is_string($skillId))) {
+                UserSkill::refreshEndorsementCount($userId, $skillId);
+            }
+        }
+    }
+
     /** @return BelongsTo<User, $this> */
     public function endorser(): BelongsTo
     {

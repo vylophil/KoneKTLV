@@ -32,6 +32,20 @@ class User extends Authenticatable
     /** @var list<string> */
     protected $fillable = ['name', 'email', 'password', 'first_name', 'last_name'];
 
+    /** @var array<string, mixed> */
+    protected $attributes = ['role' => 'job_seeker', 'is_active' => true];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user): void {
+            $targets = $user->endorsementsGiven()->get(['endorsed_user_id', 'skill_id']);
+            $user->endorsementsGiven()->delete();
+            foreach ($targets as $target) {
+                UserSkill::refreshEndorsementCount($target->getAttribute('endorsed_user_id'), $target->getAttribute('skill_id'));
+            }
+        });
+    }
+
     /** @return array<string, string> */
     protected function casts(): array
     {
