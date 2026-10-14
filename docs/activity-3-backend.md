@@ -80,3 +80,40 @@ business feature.
 The backend is ready for React/Inertia integration. `create` and `edit` return
 JSON metadata; Activity 4 supplies the actual frontend pages. Authentication
 screens and full role/permission administration belong to Activity 5.
+
+## Frontend handoff
+
+Use Inertia 3's [`useHttp`](https://inertiajs.com/docs/v3/the-basics/http-requests)
+or ordinary `fetch`/Axios for the JSON `/backend` endpoints. These endpoints
+return records and 422 errors; they do not return Inertia page responses.
+Do not send them Inertia page visits through `router`, `useForm`, or `<Form>`.
+Activity 4 must supply the React page components and page routes/controllers
+that call `Inertia::render(...)` and use redirects for Inertia form submissions.
+
+An authenticated session is required to exercise private CRUD from the browser.
+The Activity 5 login/registration/password-reset screens and permission setup
+must be integrated before authenticated end-to-end UI testing. The model and
+HTTP tests exercise that backend contract without a login screen.
+
+Send calendar dates as `YYYY-MM-DD`; convert returned ISO dates before binding
+them to HTML date inputs. Both date boundaries are checked on partial updates.
+Use `company.name`, `company.logo_url`, and `company.location` on job records
+for job cards. The embedded company data omits its account fields.
+
+Employer access to other applicants stops when the employer role is revoked.
+A blocked connection overrides accepted duplicate/reverse connections.
+Dates, identifiers, private ownership, all seven resource actions, and CSRF
+rejection have regression coverage.
+
+## Activity 3 checklist
+
+| Requirement                                              | Implementation                                                                                                             |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Database connection, normalized tables, keys, timestamps | SQLite environment template, migrations for all 16 domain tables, consistent foreign keys, cascade constraints, timestamps |
+| Eloquent models and mass-assignment protection           | All 16 models have explicit fillable arrays; one-to-one, one-to-many, and many-to-many relationships are declared          |
+| Seven CRUD actions and server validation                 | 15 resource controllers inherit the seven working actions; each supplies validated fields and access checks                |
+| Dedicated files, named routes, prefixes, groups          | 105 resource routes in dedicated files, grouped under `/backend` with `backend.*` names                                    |
+
+The `users` account lifecycle belongs to Fortify/Activity 5 rather than a public
+user-management CRUD endpoint. `create`/`edit` are JSON form metadata during
+Activity 3, ready to be connected to Activity 4 pages.

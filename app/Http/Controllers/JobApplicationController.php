@@ -29,7 +29,7 @@ class JobApplicationController extends ResourceController
         }
 
         return [
-            'job_id' => ['required', 'integer', Rule::exists('job_postings', 'id')->where('is_active', true)->where(fn ($query) => $query->whereNull('deadline')->orWhere('deadline', '>=', date('Y-m-d'))), Rule::unique('job_applications', 'job_id')->where('user_id', $this->user($request)->getKey())],
+            'job_id' => ['required', 'integer', Rule::exists('job_postings', 'id')->where('is_active', true)->where(fn ($query) => $query->whereNull('deadline')->orWhere('deadline', '>=', now()->toDateString())), Rule::unique('job_applications', 'job_id')->where('user_id', $this->user($request)->getKey())],
             'cover_letter' => ['nullable', 'string', 'max:10000'],
             'resume_url' => ['nullable', 'url:http,https', 'max:500'],
             'status' => ['prohibited'],
@@ -41,8 +41,12 @@ class JobApplicationController extends ResourceController
     {
         $user = $this->user($request);
 
-        return JobApplication::query()->where(fn ($query) => $query->where('user_id', $user->getKey())
-            ->orWhereHas('jobPosting', fn ($job) => $job->where('employer_id', $user->getKey())));
+        return JobApplication::query()->where(function ($query) use ($user): void {
+            $query->where('user_id', $user->getKey());
+            if ($user->getAttribute('role') === 'employer') {
+                $query->orWhereHas('jobPosting', fn ($job) => $job->where('employer_id', $user->getKey()));
+            }
+        });
     }
 
     protected function authorizeAction(Request $request, string $action, ?Model $record = null): void

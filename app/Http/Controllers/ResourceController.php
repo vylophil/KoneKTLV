@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Connection;
 use App\Models\User;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -142,12 +144,28 @@ abstract class ResourceController extends Controller
             fn ($rules) => ! in_array('prohibited', $rules, true)));
     }
 
+    protected function dateBoundary(Request $request, string $field, ?Model $record = null): ?string
+    {
+        $value = $request->input($field, $record?->getAttribute($field));
+        if ($value instanceof DateTimeInterface) {
+            return $value->format('Y-m-d');
+        }
+        if (! is_string($value) || preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/D', $value) !== 1) {
+            return null;
+        }
+        $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+
+        return $date !== false && $date->format('Y-m-d') === $value ? $value : null;
+    }
+
     protected function connected(User $user, int $peer): bool
     {
-        return Connection::query()->where('status', 'accepted')
+        $pair = Connection::query()
             ->where(fn ($query) => $query
                 ->where(fn ($pair) => $pair->where('requester_id', $user->getKey())->where('receiver_id', $peer))
-                ->orWhere(fn ($pair) => $pair->where('receiver_id', $user->getKey())->where('requester_id', $peer)))
-            ->exists();
+                ->orWhere(fn ($pair) => $pair->where('receiver_id', $user->getKey())->where('requester_id', $peer)));
+
+        return ! (clone $pair)->where('status', 'blocked')->exists()
+            && $pair->where('status', 'accepted')->exists();
     }
 }

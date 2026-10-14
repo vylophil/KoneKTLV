@@ -46,7 +46,7 @@ class JobPostingController extends ResourceController
             'min_experience_years' => ['nullable', 'integer', 'min:0', 'max:80'],
             'education_requirement' => ['nullable', Rule::in(['none', 'high_school', 'associate', 'bachelors', 'masters', 'doctorate'])],
             'is_active' => ['nullable', 'boolean'],
-            'deadline' => ['nullable', 'date'],
+            'deadline' => ['bail', 'nullable', 'regex:/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/D', 'date_format:Y-m-d'],
         ];
     }
 
@@ -64,7 +64,7 @@ class JobPostingController extends ResourceController
     /** @return Builder<JobPosting> */
     protected function query(Request $request): Builder
     {
-        return JobPosting::query()->where(fn ($query) => $query->where('is_active', true)
+        return JobPosting::query()->with('company:id,name,logo_url,location')->where(fn ($query) => $query->where('is_active', true)
             ->orWhere('employer_id', $this->user($request)->getKey()));
     }
 }

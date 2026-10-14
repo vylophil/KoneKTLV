@@ -171,4 +171,16 @@ class BackendResourceTest extends TestCase
         $this->assertNotContains('status', $response->json('fields'));
         $this->assertNotContains('user_id', $response->json('fields'));
     }
+
+    public function test_job_cards_include_public_company_details_without_exposing_account_fields(): void
+    {
+        $employer = User::factory()->create();
+        $company = $employer->companies()->create(['name' => 'Konekt', 'location' => 'Manila']);
+        $job = $employer->jobPostings()->create(['company_id' => $company->id, 'title' => 'Developer', 'description' => 'Work', 'job_type' => 'full_time']);
+        $applicant = User::factory()->create();
+
+        $this->actingAs($applicant)->getJson(route('backend.job-postings.show', $job->id))
+            ->assertOk()->assertJsonPath('company.name', 'Konekt')->assertJsonPath('company.location', 'Manila')
+            ->assertJsonMissingPath('company.user_id')->assertJsonMissingPath('company.user');
+    }
 }

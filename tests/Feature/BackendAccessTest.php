@@ -161,4 +161,31 @@ class BackendAccessTest extends TestCase
         $this->assertDatabaseCount('endorsements', 0);
         $this->assertDatabaseHas('user_skills', ['user_id' => $peer->id, 'skill_id' => $skill->id, 'endorsement_count' => 0]);
     }
+
+    public function test_revoking_employer_role_removes_access_to_other_users_applications(): void
+    {
+        $employer = User::factory()->create();
+        $employer->forceFill(['role' => 'employer'])->save();
+        $applicant = User::factory()->create();
+        $company = $employer->companies()->create(['name' => 'Company']);
+        $job = $employer->jobPostings()->create(['company_id' => $company->id, 'title' => 'Developer', 'description' => 'Work', 'job_type' => 'full_time']);
+        $application = $applicant->jobApplications()->create(['job_id' => $job->id]);
+        $employer->forceFill(['role' => 'job_seeker'])->save();
+
+        $this->actingAs($employer)->getJson(route('backend.job-applications.show', $application->id))->assertNotFound();
+        $this->patchJson(route('backend.job-applications.update', $application->id), ['status' => 'offered'])->assertNotFound();
+        $this->getJson(route('backend.job-applications.index'))->assertJsonPath('total', 0);
+    }
+
+    public function test_a_blocked_connection_overrides_an_accepted_reverse_connection(): void
+    {
+        $sender = User::factory()->create();
+        $receiver = User::factory()->create();
+        Connection::forceCreate(['requester_id' => $sender->id, 'receiver_id' => $receiver->id, 'status' => 'accepted']);
+        Connection::forceCreate(['requester_id' => $receiver->id, 'receiver_id' => $sender->id, 'status' => 'blocked']);
+
+        $this->actingAs($sender)->postJson(route('backend.messages.store'), ['receiver_id' => $receiver->id, 'content' => 'Blocked'])
+            ->assertUnprocessable()->assertJsonValidationErrors('receiver_id');
+        $this->assertDatabaseCount('messages', 0);
+    }
 }
