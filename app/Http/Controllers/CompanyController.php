@@ -31,6 +31,7 @@ class CompanyController extends ResourceController
 
     protected function authorizeAction(Request $request, string $action, ?Model $record = null): void
     {
-        abort_unless($this->user($request)->getAttribute('role') === 'employer', 403);
+        $this->user($request);
+        abort_unless(in_array($action, ['index', 'show'], true), 405, 'Manual company management has been retired.');
     }
 }

@@ -15,6 +15,7 @@ use Inertia\Inertia;
 Route::get('/', HomeController::class)->name('home');
 Route::get('/jobs', [JobsPageController::class, 'index'])->name('jobs.index');
 Route::get('/jobs/{job}', [JobsPageController::class, 'show'])->whereNumber('job')->name('jobs.show');
+Route::get('/jobs/{job}/out', [JobsPageController::class, 'out'])->whereNumber('job')->name('jobs.out');
 
 Route::middleware(['auth', 'active'])->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
@@ -24,6 +25,7 @@ Route::middleware(['auth', 'active'])->group(function (): void {
     Route::delete('/jobs/{job}/save', [JobsPageController::class, 'unsave'])->name('jobs.unsave');
     Route::get('/saved-jobs', [JobsPageController::class, 'saved'])->name('saved-jobs.index');
     Route::get('/applications', [JobsPageController::class, 'applications'])->name('applications.index');
+    Route::put('/applications/{application}', [JobsPageController::class, 'updateApplication'])->name('applications.update');
     Route::get('/applications/{application}/resume', [JobsPageController::class, 'applicationResume'])->name('applications.resume');
     Route::get('/matches', [MatchesPageController::class, 'index'])->name('matches.index');
     Route::post('/matches/refresh', [MatchesPageController::class, 'refresh'])->middleware('throttle:5,1')->name('matches.refresh');

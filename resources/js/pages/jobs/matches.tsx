@@ -28,7 +28,7 @@ export default function Matches({
         <Portal title="Resume matches">
             <PageTitle
                 title="Matches for your experience"
-                description="Roles ranked by shared keywords in your resume and the job description. Scores are a starting point for your search."
+                description="Compare your resume with listings retrieved through KoneKT. Search for relevant jobs to expand this set, then refresh. Scores measure shared keywords, not hiring suitability."
                 action={
                     hasResume && (
                         <form

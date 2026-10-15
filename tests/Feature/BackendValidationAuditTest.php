@@ -48,8 +48,8 @@ class BackendValidationAuditTest extends TestCase
         $user->forceFill(['role' => 'employer'])->save();
         $skill = Skill::create(['name' => 'PHP']);
 
-        $this->actingAs($user)->postJson(route('backend.job-skills.store'), ['job_id' => [1], 'skill_id' => $skill->id])
-            ->assertUnprocessable()->assertJsonValidationErrors('job_id');
+        $this->actingAs($user)->postJson(route('backend.user-skills.store'), ['skill_id' => [1]])
+            ->assertUnprocessable()->assertJsonValidationErrors('skill_id');
         $this->postJson(route('backend.endorsements.store'), ['endorsed_user_id' => [1], 'skill_id' => $skill->id])
             ->assertUnprocessable()->assertJsonValidationErrors('endorsed_user_id');
     }

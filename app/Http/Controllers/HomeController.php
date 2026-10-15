@@ -22,6 +22,7 @@ class HomeController extends Controller
 
         return Inertia::render('home', [
             'jobs' => JobPosting::query()->with('company')->where('is_active', true)
+                ->when(config('services.jsearch.enabled'), fn ($query) => $query->where('source', 'jsearch'))
                 ->where(fn ($query) => $query->whereNull('deadline')->orWhereDate('deadline', '>=', today()))
                 ->latest()->orderByDesc('id')->limit(3)->get()->map(fn (JobPosting $job) => JobView::data($job)),
         ]);

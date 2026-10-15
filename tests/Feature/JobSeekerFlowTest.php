@@ -67,7 +67,7 @@ class JobSeekerFlowTest extends TestCase
         $this->assertDatabaseMissing('saved_jobs', ['user_id' => $user->id]);
     }
 
-    public function test_application_keeps_a_private_resume_snapshot_and_prevents_duplicates(): void
+    public function test_self_reported_tracking_is_idempotent_and_does_not_upload_a_resume(): void
     {
         Storage::fake('local');
         $job = $this->job();
@@ -76,30 +76,30 @@ class JobSeekerFlowTest extends TestCase
         Storage::disk('local')->put('resumes/original.pdf', 'original resume');
         $this->actingAs($user)->post('/jobs/'.$job->id.'/apply', ['cover_letter' => 'My relevant experience.'])->assertRedirect('/applications');
         $application = JobApplication::query()->sole();
-        $this->assertSame('original resume', Storage::disk('local')->get($application->resume_path));
+        $this->assertNull($application->resume_path);
         Storage::disk('local')->put('resumes/original.pdf', 'replacement resume');
-        $this->assertSame('original resume', Storage::disk('local')->get($application->resume_path));
-        $this->get('/applications/'.$application->id.'/resume')->assertOk();
-        $this->get('/applications')->assertInertia(fn (Assert $page) => $page->has('applications.data', 1)->where('applications.data.0.status', 'pending'));
-        $this->post('/jobs/'.$job->id.'/apply')->assertSessionHasErrors('application');
+        $this->assertNull($application->resume_path);
+        $this->get('/applications/'.$application->id.'/resume')->assertNotFound();
+        $this->get('/applications')->assertInertia(fn (Assert $page) => $page->has('applications.data', 1)->where('applications.data.0.status', 'applied')->where('applications.data.0.selfReported', true));
+        $this->post('/jobs/'.$job->id.'/apply')->assertRedirect('/applications');
         $this->assertDatabaseCount('job_applications', 1);
-        $this->assertCount(1, Storage::disk('local')->allFiles('applications'));
+        $this->assertCount(0, Storage::disk('local')->allFiles('applications'));
         $this->actingAs(User::factory()->create())->get('/applications/'.$application->id.'/resume')->assertNotFound();
-        $this->actingAs($job->employer)->get('/applications/'.$application->id.'/resume')->assertOk();
+        $this->actingAs($job->employer)->get('/applications/'.$application->id.'/resume')->assertNotFound();
     }
 
-    public function test_applications_require_a_resume_open_job_and_seeker_role(): void
+    public function test_tracking_needs_no_resume_and_legacy_business_role_grants_no_special_privilege(): void
     {
         $job = $this->job();
         $user = User::factory()->create();
-        $this->actingAs($user)->post('/jobs/'.$job->id.'/apply')->assertSessionHasErrors('application');
+        $this->actingAs($user)->post('/jobs/'.$job->id.'/apply')->assertRedirect('/applications');
         $job->update(['deadline' => now()->subDay()]);
-        $this->post('/jobs/'.$job->id.'/apply')->assertStatus(409);
+        $this->post('/jobs/'.$job->id.'/apply')->assertRedirect('/applications');
         $this->post('/jobs/'.$job->id.'/save')->assertStatus(409);
         $employer = User::factory()->create();
         $employer->setAttribute('role', 'employer')->save();
-        $this->actingAs($employer)->post('/jobs/'.$job->id.'/apply')->assertForbidden();
-        $this->assertDatabaseCount('job_applications', 0);
+        $this->actingAs($employer)->post('/jobs/'.$job->id.'/apply')->assertRedirect('/applications');
+        $this->assertDatabaseCount('job_applications', 2);
     }
 
     public function test_profile_editor_validates_and_uses_only_the_signed_in_owner(): void

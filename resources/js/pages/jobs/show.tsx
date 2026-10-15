@@ -5,21 +5,22 @@ export default function JobDetail({
     job,
     isSaved,
     application,
-    hasResume,
     backUrl,
 }: {
     job: Job;
     isSaved: boolean;
     application: { id: number; status: string } | null;
-    hasResume: boolean;
     backUrl: string;
 }) {
-    const { auth } = usePage<{ auth: { user: { role: string } | null } }>()
+    const { auth } = usePage<{ auth: { user: { name: string } | null } }>()
         .props;
-    const apply = useForm({ cover_letter: '' });
+    const track = useForm({});
     const save = useForm({});
-    const applicationError = (apply.errors as Record<string, string>)
-        .application;
+    const salary =
+        job.salaryText ||
+        (job.salaryMin !== null || job.salaryMax !== null
+            ? `${job.currency ?? ''} ${job.salaryMin ?? '—'} – ${job.salaryMax ?? '—'}${job.salaryPeriod ? ` / ${job.salaryPeriod.toLowerCase()}` : ' (pay period not supplied)'}`.trim()
+            : 'Salary not disclosed');
     return (
         <Portal title={job.title}>
             <Link href={backUrl} className="kt-text-link">
@@ -35,121 +36,91 @@ export default function JobDetail({
                 <div>
                     <section className="kt-section">
                         <h2>About this role</h2>
-                        <p className="kt-prose">{job.description}</p>
-                    </section>
-                    <section className="kt-section">
-                        <h2>What you’ll do</h2>
                         <p className="kt-prose">
-                            {job.responsibilities ||
-                                'The employer has not added responsibilities for this role yet.'}
+                            {job.description ||
+                                'A description was not supplied. Open the original listing for complete details.'}
                         </p>
                     </section>
-                    <section className="kt-section">
-                        <h2>What you’ll bring</h2>
-                        <p className="kt-prose">
-                            {job.requirements ||
-                                'The employer has not added specific requirements yet.'}
-                        </p>
-                    </section>
+                    {job.responsibilities && (
+                        <section className="kt-section">
+                            <h2>What you’ll do</h2>
+                            <p className="kt-prose">{job.responsibilities}</p>
+                        </section>
+                    )}
+                    {job.requirements && (
+                        <section className="kt-section">
+                            <h2>What you’ll bring</h2>
+                            <p className="kt-prose">{job.requirements}</p>
+                        </section>
+                    )}
                     {job.companyDescription && (
                         <section className="kt-section">
                             <h2>About {job.company}</h2>
                             <p className="kt-prose">{job.companyDescription}</p>
                         </section>
                     )}
-                    {auth.user?.role === 'job_seeker' &&
-                        !application &&
-                        job.isOpen && (
-                            <section className="kt-section" id="apply">
-                                <h2>Apply for this role</h2>
-                                {hasResume ? (
-                                    <form
-                                        onSubmit={(event) => {
-                                            event.preventDefault();
-                                            apply.post(`/jobs/${job.id}/apply`);
-                                        }}
-                                    >
-                                        <p className="mb-5">
-                                            A private copy of your current
-                                            resume will be attached to this
-                                            application.
-                                        </p>
-                                        <div className="kt-field">
-                                            <label htmlFor="cover-letter">
-                                                Cover letter{' '}
-                                                <span className="font-normal">
-                                                    (optional)
-                                                </span>
-                                            </label>
-                                            <textarea
-                                                id="cover-letter"
-                                                maxLength={10000}
-                                                value={apply.data.cover_letter}
-                                                aria-describedby={
-                                                    apply.errors.cover_letter
-                                                        ? 'cover-letter-error'
-                                                        : undefined
-                                                }
-                                                onChange={(event) =>
-                                                    apply.setData(
-                                                        'cover_letter',
-                                                        event.target.value,
-                                                    )
-                                                }
-                                            />
-                                            {apply.errors.cover_letter && (
-                                                <p
-                                                    id="cover-letter-error"
-                                                    className="kt-error"
-                                                    role="alert"
-                                                >
-                                                    {apply.errors.cover_letter}
-                                                </p>
-                                            )}
-                                        </div>
-                                        {applicationError && (
-                                            <p
-                                                role="alert"
-                                                className="kt-error"
-                                            >
-                                                {applicationError}
-                                            </p>
-                                        )}
-                                        <div className="kt-form-actions">
-                                            <button
-                                                type="submit"
-                                                className="kt-button"
-                                                disabled={apply.processing}
-                                            >
-                                                {apply.processing
-                                                    ? 'Sending application…'
-                                                    : 'Send application'}
-                                            </button>
-                                            <Link
-                                                className="kt-text-link"
-                                                href="/profile?section=resume"
-                                            >
-                                                Review your resume
-                                            </Link>
-                                        </div>
-                                    </form>
-                                ) : (
-                                    <>
-                                        <p>
-                                            Upload your resume before applying.
-                                            You can return to this role when
-                                            it’s ready.
-                                        </p>
-                                        <Link
-                                            className="kt-text-link"
-                                            href="/profile?section=resume"
-                                        >
-                                            Upload a resume
-                                        </Link>
-                                    </>
-                                )}
-                            </section>
+                    <section className="kt-section" id="apply">
+                        <h2>Apply on the original site</h2>
+                        <p>
+                            Complete your application on the listing’s source
+                            website. Opening the link does not submit an
+                            application, and KoneKT does not send your resume.
+                        </p>
+                        {job.applyUrl && job.isOpen ? (
+                            <a
+                                className="kt-button mt-5"
+                                href={`/jobs/${job.id}/out`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Apply on source site{' '}
+                                <span className="sr-only">
+                                    (opens a new tab)
+                                </span>
+                            </a>
+                        ) : (
+                            <p className="mt-4">
+                                An active application link is unavailable for
+                                this archived listing.{' '}
+                                <Link href="/jobs" className="kt-text-link">
+                                    Find current roles
+                                </Link>
+                            </p>
                         )}
+                    </section>
+                    {auth.user && (
+                        <section className="kt-section">
+                            <h2>Your application tracker</h2>
+                            <p>
+                                After applying on the source site, mark it here
+                                to keep a personal record. Updates are entered
+                                by you.
+                            </p>
+                            {application && application.status !== 'opened' ? (
+                                <Link
+                                    className="kt-text-link mt-3"
+                                    href="/applications"
+                                >
+                                    View and update your progress
+                                </Link>
+                            ) : (
+                                <form
+                                    className="mt-5"
+                                    onSubmit={(event) => {
+                                        event.preventDefault();
+                                        track.post(`/jobs/${job.id}/apply`);
+                                    }}
+                                >
+                                    <button
+                                        className="kt-button kt-button-secondary"
+                                        disabled={track.processing}
+                                    >
+                                        I’ve applied — add to tracker
+                                    </button>
+                                </form>
+                            )}
+                        </section>
+                    )}
                 </div>
                 <aside className="kt-sidebar">
                     <h2>Role at a glance</h2>
@@ -163,13 +134,32 @@ export default function JobDetail({
                             <dd>{job.workType}</dd>
                         </div>
                         <div>
-                            <dt>Salary</dt>
-                            <dd>
-                                {job.salaryMin || job.salaryMax
-                                    ? `${job.currency ?? 'PHP'} ${job.salaryMin ?? '—'} – ${job.salaryMax ?? '—'}`
-                                    : 'Not specified'}
-                            </dd>
+                            <dt>Advertised salary</dt>
+                            <dd>{salary}</dd>
                         </div>
+                        {job.publisher && (
+                            <div>
+                                <dt>Listing publisher</dt>
+                                <dd>{job.publisher}</dd>
+                            </div>
+                        )}
+                        {job.fetchedAt && (
+                            <div>
+                                <dt>Last retrieved</dt>
+                                <dd>
+                                    <time dateTime={job.fetchedAt}>
+                                        {new Date(job.fetchedAt).toLocaleString(
+                                            'en-PH',
+                                            {
+                                                timeZone: 'Asia/Manila',
+                                                dateStyle: 'medium',
+                                                timeStyle: 'short',
+                                            },
+                                        )}
+                                    </time>
+                                </dd>
+                            </div>
+                        )}
                         {job.deadline && (
                             <div>
                                 <dt>Apply by</dt>
@@ -177,41 +167,16 @@ export default function JobDetail({
                             </div>
                         )}
                     </dl>
-                    {!job.isOpen ? (
-                        <p>This role is no longer accepting applications.</p>
-                    ) : application ? (
-                        <>
-                            <p className="kt-status">{application.status}</p>
-                            <Link href="/applications" className="kt-button">
-                                View your application
-                            </Link>
-                        </>
-                    ) : auth.user?.role === 'job_seeker' ? (
-                        <a href="#apply" className="kt-button">
-                            {hasResume
-                                ? 'Apply for this role'
-                                : 'Get ready to apply'}
-                        </a>
-                    ) : !auth.user ? (
-                        <>
-                            <p>
-                                Sign in to save this role or send an
-                                application.
-                            </p>
-                            <Link
-                                href={`/jobs/${job.id}/apply`}
-                                method="get"
-                                className="kt-button"
-                            >
-                                Sign in to apply
-                            </Link>
-                        </>
-                    ) : (
-                        <p>
-                            Applications are available to job-seeker accounts.
+                    {application && (
+                        <p className="kt-status">
+                            {application.status === 'opened'
+                                ? 'Application link opened'
+                                : application.status === 'pending'
+                                  ? 'Legacy application record'
+                                  : application.status}
                         </p>
                     )}
-                    {auth.user?.role === 'job_seeker' &&
+                    {auth.user ? (
                         (job.isOpen || isSaved) && (
                             <form
                                 onSubmit={(event) => {
@@ -228,7 +193,6 @@ export default function JobDetail({
                             >
                                 <button
                                     className="kt-button kt-button-secondary"
-                                    type="submit"
                                     disabled={save.processing}
                                 >
                                     {isSaved
@@ -236,7 +200,18 @@ export default function JobDetail({
                                         : 'Save job'}
                                 </button>
                             </form>
-                        )}
+                        )
+                    ) : (
+                        <>
+                            <p>
+                                Sign in to save roles and track your own
+                                application progress.
+                            </p>
+                            <Link className="kt-button" href="/saved-jobs">
+                                Sign in to save jobs
+                            </Link>
+                        </>
+                    )}
                 </aside>
             </div>
         </Portal>

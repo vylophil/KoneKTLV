@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'jsearch' => [
+        'key' => env('JSEARCH_API_KEY'),
+        'enabled' => env('JSEARCH_ENABLED', filled(env('JSEARCH_API_KEY'))),
+        'cache_seconds' => 21600,
+        'monthly_limit' => (int) env('JSEARCH_MONTHLY_LIMIT', 180),
+    ],
 
     /*
     |--------------------------------------------------------------------------

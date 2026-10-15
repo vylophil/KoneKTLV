@@ -66,11 +66,11 @@ local/testing environments. These credentials are for development only.
 4. Upload a text-based PDF of at most 5 MB. Image-only scanned PDFs cannot be
    matched. Uploading takes you to `/matches`, where each result explains its
    shared keywords. Refresh matches to include newly posted roles.
-5. Open a job and choose **Save job** or **Send application**. Applications require
-   a resume. A private copy is attached to the application, so replacing your
-   profile resume does not change a submitted application.
-6. Revisit your shortlist at `/saved-jobs` and track submissions at `/applications`.
-   Only the applicant and the role's employer can download an attached resume.
+5. Open a job and choose **Save job** or **Apply on source site**. The source site
+   handles the actual application. KoneKT never automatically sends your resume.
+6. After submitting externally, choose **I've applied**. Manage self-reported
+   progress and private notes at `/applications`. Opening a link alone is recorded
+   as **Link opened**, not as a submission. Archived resume copies are owner-only.
 7. Use **Forgot password?** on sign-in for account recovery. Configure mail for
    real email delivery; local `log` mail writes reset messages to Laravel's log.
 8. Account deletion is in `/settings`, with an exact-email confirmation. It
@@ -87,6 +87,24 @@ reference, and are not automatically connected to the application.
 - [Backend resource contract](docs/activity-3-backend.md)
 - [Job-seeker web flow](docs/job-seeker-flow.md)
 - [Activity 5 authentication and access control](docs/activity-5-auth-access-control.md)
+- [JSearch Philippine integration and migration](docs/jsearch-integration.md)
+
+## Real Philippine jobs
+
+Set `JSEARCH_API_KEY` in your local `.env`, run `php artisan migrate`, and rebuild
+the frontend. JSearch is enabled automatically when a key is configured. The key
+stays on the server. `/jobs` searches Philippine listings with cursor pagination;
+the homepage previews already-retrieved listings without another provider call.
+
+Searches are cached for six hours. `JSEARCH_MONTHLY_LIMIT` defaults to 180 uncached,
+single-page requests per calendar month; the database counter survives cache clears.
+This is an application limit, not an account-wide guarantee for requests made by
+other tools. API failures show a safe message and allow browsing retrieved listings.
+
+Imported jobs do not need employer accounts or manually created company records.
+Manual company, job-posting, and job-skill writes are retired. Admin/Manager/User
+remain internal access permissions. Legacy ownership and business-role columns are
+retained for historical data and do not grant employer access to job seekers' records.
 
 Activity 5 adds a staff skill catalog at `/staff/skills` for Admins and Managers,
 and user role assignment at `/admin/users` for Admins. Run `php artisan db:seed`

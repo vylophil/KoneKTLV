@@ -17,8 +17,8 @@ class BackendResourceTest extends TestCase
     public static function resources(): array
     {
         return array_map(fn ($resource) => [$resource], [
-            'skills', 'profiles', 'user-skills', 'experience', 'education', 'companies',
-            'job-postings', 'job-skills', 'job-applications', 'saved-jobs', 'job-matches',
+            'skills', 'profiles', 'user-skills', 'experience', 'education',
+            'job-applications', 'saved-jobs', 'job-matches',
             'connections', 'messages', 'endorsements', 'profile-views',
         ]);
     }
@@ -27,9 +27,6 @@ class BackendResourceTest extends TestCase
     public function test_all_seven_resource_actions_work(string $resource): void
     {
         $owner = User::factory()->create();
-        if ($resource !== 'job-applications') {
-            $owner->forceFill(['role' => 'employer'])->save();
-        }
         Gate::define('manage skills', fn (User $user) => $user->is($owner));
         Gate::define('manage job matches', fn (User $user) => $user->is($owner));
         [$payload, $update] = $this->payload($resource, $owner);
@@ -122,9 +119,8 @@ class BackendResourceTest extends TestCase
         $job = $owner->jobPostings()->create(['company_id' => $company->id, 'title' => 'Job', 'description' => 'Work', 'job_type' => 'full_time']);
         $this->actingAs($other);
 
-        $this->postJson(route('backend.job-postings.store'), ['company_id' => $company->id, 'title' => 'Intruder', 'description' => 'Work', 'job_type' => 'full_time'])
-            ->assertUnprocessable()->assertJsonValidationErrors('company_id');
-        $this->patchJson(route('backend.job-postings.update', $job->id), ['title' => 'Intruder'])->assertForbidden();
+        $this->postJson('/backend/job-postings', ['company_id' => $company->id, 'title' => 'Intruder', 'description' => 'Work', 'job_type' => 'full_time'])->assertStatus(405);
+        $this->patchJson('/backend/job-postings/'.$job->id, ['title' => 'Intruder'])->assertStatus(405);
         $this->getJson(route('backend.job-postings.show', $job->id))->assertOk();
     }
 
@@ -136,8 +132,8 @@ class BackendResourceTest extends TestCase
         $job = $owner->jobPostings()->create(['company_id' => $company->id, 'title' => 'Job', 'description' => 'Work', 'job_type' => 'full_time', 'salary_min' => 100, 'salary_max' => 200]);
         $this->actingAs($owner);
 
-        $this->patchJson(route('backend.job-postings.update', $job->id), ['salary_min' => 300])->assertUnprocessable()->assertJsonValidationErrors('salary_min');
-        $this->patchJson(route('backend.job-postings.update', $job->id), ['salary_max' => 50])->assertUnprocessable()->assertJsonValidationErrors('salary_max');
+        $this->patchJson('/backend/job-postings/'.$job->id, ['salary_min' => 300])->assertStatus(405);
+        $this->patchJson('/backend/job-postings/'.$job->id, ['salary_max' => 50])->assertStatus(405);
     }
 
     public function test_catalog_writes_and_inactive_accounts_are_restricted(): void
@@ -168,7 +164,9 @@ class BackendResourceTest extends TestCase
         $response = $this->actingAs($user)->getJson(route('backend.job-applications.create'))->assertOk();
 
         $this->assertContains('job_id', $response->json('fields'));
-        $this->assertNotContains('status', $response->json('fields'));
+        $this->assertContains('status', $response->json('fields'));
+        $this->assertNotContains('self_reported', $response->json('fields'));
+        $this->assertNotContains('resume_path', $response->json('fields'));
         $this->assertNotContains('user_id', $response->json('fields'));
     }
 

@@ -49,7 +49,7 @@ class BackendAccessTest extends TestCase
         $this->deleteJson(route('backend.messages.destroy', $id))->assertForbidden();
     }
 
-    public function test_applicants_cannot_set_employer_decisions_and_employers_cannot_change_their_documents(): void
+    public function test_application_progress_is_self_reported_and_private_even_from_legacy_job_owners(): void
     {
         $employer = User::factory()->create();
         $employer->forceFill(['role' => 'employer'])->save();
@@ -57,17 +57,17 @@ class BackendAccessTest extends TestCase
         $outsider = User::factory()->create();
         $company = $employer->companies()->create(['name' => 'Company']);
         $job = $employer->jobPostings()->create(['company_id' => $company->id, 'title' => 'Developer', 'description' => 'Work', 'job_type' => 'full_time']);
-        $this->actingAs($applicant)->postJson(route('backend.job-applications.store'), ['job_id' => $job->id, 'status' => 'accepted'])->assertUnprocessable();
+        $this->actingAs($applicant)->postJson(route('backend.job-applications.store'), ['job_id' => $job->id, 'self_reported' => false])->assertUnprocessable();
         $created = $this->postJson(route('backend.job-applications.store'), ['job_id' => $job->id, 'cover_letter' => 'Applicant document'])->assertCreated();
         $id = $created->json('id');
-        $this->patchJson(route('backend.job-applications.update', $id), ['status' => 'offered'])->assertUnprocessable();
-        $this->actingAs($outsider)->getJson(route('backend.job-applications.show', $id))->assertNotFound();
-        $this->actingAs($employer)->getJson(route('backend.job-applications.show', $id))->assertOk();
-        $this->patchJson(route('backend.job-applications.update', $id), ['cover_letter' => 'Tampered'])->assertUnprocessable();
         $this->patchJson(route('backend.job-applications.update', $id), ['status' => 'offered'])->assertOk();
-        $this->deleteJson(route('backend.job-applications.destroy', $id))->assertForbidden();
+        $this->actingAs($outsider)->getJson(route('backend.job-applications.show', $id))->assertNotFound();
+        $this->actingAs($employer)->getJson(route('backend.job-applications.show', $id))->assertNotFound();
+        $this->patchJson(route('backend.job-applications.update', $id), ['cover_letter' => 'Tampered'])->assertNotFound();
+        $this->patchJson(route('backend.job-applications.update', $id), ['status' => 'offered'])->assertNotFound();
+        $this->deleteJson(route('backend.job-applications.destroy', $id))->assertNotFound();
         $this->actingAs($applicant)->patchJson(route('backend.job-applications.update', $id), ['status' => 'accepted'])->assertOk();
-        $this->actingAs($employer)->patchJson(route('backend.job-applications.update', $id), ['status' => 'reviewing'])->assertConflict();
+        $this->actingAs($employer)->patchJson(route('backend.job-applications.update', $id), ['status' => 'interview'])->assertNotFound();
     }
 
     public function test_applications_reject_inactive_or_expired_jobs_and_duplicate_applications(): void

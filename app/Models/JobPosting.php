@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/** @property CarbonImmutable|null $deadline */
+/**
+ * @property CarbonImmutable|null $deadline
+ * @property CarbonImmutable|null $fetched_at
+ * @property-read Company|null $company
+ */
 class JobPosting extends Model
 {
     protected $table = 'job_postings';
@@ -62,6 +66,8 @@ class JobPosting extends Model
             'min_experience_years' => 'integer',
             'is_active' => 'boolean',
             'deadline' => 'immutable_date',
+            'source_posted_at' => 'immutable_datetime',
+            'fetched_at' => 'immutable_datetime',
             'created_at' => 'immutable_datetime',
             'updated_at' => 'immutable_datetime',
         ];

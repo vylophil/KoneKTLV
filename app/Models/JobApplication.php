@@ -9,13 +9,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /** @property CarbonImmutable|null $applied_at */
 class JobApplication extends Model
 {
+    /** @var array<string, mixed> */
+    protected $attributes = ['status' => 'applied', 'self_reported' => true];
+
     /** @var list<string> */
     protected $hidden = ['resume_path'];
 
     protected $table = 'job_applications';
 
     /** @var list<string> */
-    protected $fillable = ['job_id', 'cover_letter', 'resume_url', 'status'];
+    protected $fillable = ['job_id', 'cover_letter', 'resume_url', 'status', 'self_reported', 'opened_at', 'notes'];
+
+    protected static function booted(): void
+    {
+        static::updating(function (JobApplication $application): void {
+            if ($application->isDirty(['status', 'notes'])) {
+                $application->self_reported = true;
+            }
+        });
+    }
 
     /** @return BelongsTo<JobPosting, $this> */
     public function jobPosting(): BelongsTo
@@ -34,6 +46,8 @@ class JobApplication extends Model
     {
         return [
             'applied_at' => 'immutable_datetime',
+            'opened_at' => 'immutable_datetime',
+            'self_reported' => 'boolean',
             'updated_at' => 'immutable_datetime',
         ];
     }

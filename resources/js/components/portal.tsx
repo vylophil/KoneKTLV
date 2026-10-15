@@ -103,9 +103,7 @@ export function Portal({
                             </span>
                             <div>
                                 <span>{member.name}</span>
-                                <small>
-                                    {member.role?.replaceAll('_', ' ')}
-                                </small>
+                                <small>Job seeker</small>
                             </div>
                             <Link href="/settings" className="kt-settings-link">
                                 Settings
@@ -245,6 +243,12 @@ export function EmptyState({
 }
 
 export type Job = {
+    source: string;
+    publisher: string | null;
+    applyUrl: string | null;
+    salaryPeriod: string | null;
+    salaryText: string | null;
+    fetchedAt: string | null;
     id: number;
     title: string;
     company: string;

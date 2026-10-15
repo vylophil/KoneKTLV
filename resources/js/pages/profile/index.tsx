@@ -564,8 +564,8 @@ function ResumeSection({ resume }: { resume: ProfileProps['resume'] }) {
             <h2 className="text-2xl font-semibold">Your resume</h2>
             <p className="kt-prose mt-3">
                 Upload a text-based PDF, up to 5 MB. It stays private and is
-                used to find keyword matches. A separate copy is attached when
-                you apply to a role.
+                used for keyword matching inside KoneKT. Applications happen on
+                the source website; KoneKT does not send your resume there.
             </p>
             {resume && (
                 <div className="kt-section mt-6">

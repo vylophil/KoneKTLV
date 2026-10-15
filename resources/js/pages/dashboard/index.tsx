@@ -43,7 +43,7 @@ export default function Dashboard({
         {
             section: 'resume',
             title: 'Upload your resume',
-            description: 'A text-based PDF for matching and applications',
+            description: 'A private text-based PDF for keyword matching',
             done: !!resume,
         },
         {

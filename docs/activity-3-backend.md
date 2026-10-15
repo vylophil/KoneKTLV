@@ -1,5 +1,11 @@
 # Activity 3 backend
 
+Historical contract: the JSearch integration retires manual company, job-posting,
+and job-skill writes (405), and makes applications an owner-only personal tracker.
+The employer marketplace behavior below describes the earlier implementation.
+See [the current job-seeker flow](job-seeker-flow.md) and
+[JSearch migration](jsearch-integration.md) before integrating these resources.
+
 The Laravel database covers the 16 tables in `database/konekt_db.sql`.
 Migrations use matching foreign-key types, cascading constraints, uniqueness
 rules, and timestamps. Eloquent models expose explicit relationships and
