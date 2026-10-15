@@ -17,8 +17,6 @@ class ResumeUploadTest extends TestCase
 
     private const PDF_MIME_TYPE = 'application/pdf';
 
-    private const MATCH_ANCHOR = '#matches';
-
     public function test_fortify_login_and_registration_pages_render(): void
     {
         $this->get('/login')->assertOk()->assertInertia(fn (Assert $page) => $page->component('auth/login'));
@@ -33,7 +31,7 @@ class ResumeUploadTest extends TestCase
 
         $this->actingAs($user)->from('/')->post(route('profile.resume.store'), [
             'resume' => UploadedFile::fake()->createWithContent('resume.pdf', $this->textPdf('PHP Laravel developer')),
-        ])->assertRedirect(route('home').self::MATCH_ANCHOR);
+        ])->assertRedirect(route('matches.index'));
 
         $profile = Profile::query()->where('user_id', $user->id)->firstOrFail();
         $oldPath = $profile->resume_path;
@@ -42,7 +40,7 @@ class ResumeUploadTest extends TestCase
 
         $this->actingAs($user)->from('/')->post(route('profile.resume.store'), [
             'resume' => UploadedFile::fake()->createWithContent('updated-resume.pdf', $this->textPdf('React engineer')),
-        ])->assertRedirect(route('home').self::MATCH_ANCHOR);
+        ])->assertRedirect(route('matches.index'));
 
         $profile->refresh();
         $this->assertSame('updated-resume.pdf', $profile->resume_original_name);
@@ -102,15 +100,15 @@ class ResumeUploadTest extends TestCase
                 'resume.pdf',
                 $this->textPdf('PHP Laravel MySQL React backend engineer'),
             ),
-        ])->assertRedirect(route('home').self::MATCH_ANCHOR);
+        ])->assertRedirect(route('matches.index'));
 
         $match = JobMatch::query()->where('user_id', $user->id)->where('job_id', $job->id)->firstOrFail();
         $this->assertGreaterThan(0, (float) $match->match_score);
         $this->assertDatabaseCount('job_matches', 1);
-        $this->actingAs($user)->get('/')->assertInertia(fn (Assert $page) => $page
-            ->has('matchedJobs', 1)
-            ->where('matchedJobs.0.id', $job->id)
-            ->where('matchedJobs.0.title', 'Laravel Backend Engineer')
+        $this->actingAs($user)->get('/matches')->assertInertia(fn (Assert $page) => $page
+            ->has('matches.data', 1)
+            ->where('matches.data.0.job.id', $job->id)
+            ->where('matches.data.0.job.title', 'Laravel Backend Engineer')
         );
 
         $this->actingAs($user)->from('/')->post(route('profile.resume.store'), [
@@ -118,15 +116,22 @@ class ResumeUploadTest extends TestCase
                 'design-resume.pdf',
                 $this->textPdf('Adobe Illustrator visual design'),
             ),
-        ])->assertRedirect(route('home').self::MATCH_ANCHOR);
+        ])->assertRedirect(route('matches.index'));
 
         $this->assertDatabaseMissing('job_matches', ['user_id' => $user->id, 'job_id' => $job->id]);
         $this->assertDatabaseHas('job_matches', ['user_id' => $user->id, 'job_id' => $designerJob->id]);
         $this->assertDatabaseCount('job_matches', 1);
-        $this->actingAs($user)->get('/')->assertInertia(fn (Assert $page) => $page
-            ->has('matchedJobs', 1)
-            ->where('matchedJobs.0.id', $designerJob->id)
+        $this->actingAs($user)->get('/matches')->assertInertia(fn (Assert $page) => $page
+            ->has('matches.data', 1)
+            ->where('matches.data.0.job.id', $designerJob->id)
+            ->where('matches.data.0.terms', fn ($terms) => in_array('illustrator', $terms->all(), true))
         );
+        $newJob = $employer->jobPostings()->create([
+            'company_id' => $company->id, 'title' => 'Illustrator',
+            'description' => 'Create Adobe Illustrator designs.', 'job_type' => 'contract',
+        ]);
+        $this->post('/matches/refresh')->assertRedirect('/matches');
+        $this->assertDatabaseHas('job_matches', ['user_id' => $user->id, 'job_id' => $newJob->id]);
     }
 
     public function test_upload_rejects_a_pdf_with_no_extractable_text(): void

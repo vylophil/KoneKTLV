@@ -38,27 +38,26 @@ class PublicJobListingTest extends TestCase
             'deadline' => now()->subDay()->toDateString(),
         ]);
 
-        $this->get('/')->assertOk()->assertInertia(fn (Assert $page) => $page
+        $this->get('/jobs')->assertOk()->assertInertia(fn (Assert $page) => $page
             ->component('jobs/index')
-            ->where('canUploadResume', false)
-            ->has('jobs', 1)
-            ->where('jobs.0.id', $visibleJob->id)
-            ->where('jobs.0.title', 'Frontend Engineer')
-            ->where('jobs.0.company', 'Northstar Labs')
-            ->where('jobs.0.location', 'Quezon City')
-            ->where('jobs.0.workType', 'Full Time')
-            ->where('jobs.0.workArrangement', 'Hybrid')
+            ->has('jobs.data', 1)
+            ->where('jobs.data.0.id', $visibleJob->id)
+            ->where('jobs.data.0.title', 'Frontend Engineer')
+            ->where('jobs.data.0.company', 'Northstar Labs')
+            ->where('jobs.data.0.location', 'Quezon City')
+            ->where('jobs.data.0.workType', 'Full Time')
+            ->where('jobs.data.0.workArrangement', 'Hybrid')
         );
 
-        $this->get('/?search=Northstar')->assertOk()->assertInertia(fn (Assert $page) => $page
-            ->where('search', 'Northstar')
-            ->has('jobs', 1)
-            ->where('jobs.0.id', $visibleJob->id)
+        $this->get('/jobs?search=Northstar')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->where('filters.search', 'Northstar')
+            ->has('jobs.data', 1)
+            ->where('jobs.data.0.id', $visibleJob->id)
         );
 
-        $this->get('/?search=missing')->assertOk()->assertInertia(fn (Assert $page) => $page
-            ->where('search', 'missing')
-            ->has('jobs', 0)
+        $this->get('/jobs?search=missing')->assertOk()->assertInertia(fn (Assert $page) => $page
+            ->where('filters.search', 'missing')
+            ->has('jobs.data', 0)
         );
     }
 }

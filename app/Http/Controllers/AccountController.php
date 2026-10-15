@@ -28,6 +28,7 @@ class AccountController extends Controller
         if (is_string($resumePath)) {
             Storage::disk('local')->delete($resumePath);
         }
+        Storage::disk('local')->deleteDirectory('applications/'.$user->id);
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

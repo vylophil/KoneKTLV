@@ -24,7 +24,7 @@ class ResumeController extends Controller
         ]);
 
         $user = $request->user();
-        abort_unless($user instanceof User, 403);
+        abort_unless($user instanceof User && $user->is_active, 403);
 
         /** @var UploadedFile $file */
         $file = $validated['resume'];
@@ -66,7 +66,9 @@ class ResumeController extends Controller
             Storage::disk('local')->delete($oldPath);
         }
 
-        return redirect()->to(route('home').'#matches');
+        $user->unsetRelation('profile');
+
+        return to_route('matches.index')->with('success', 'Resume uploaded. Your matches are ready to review.');
     }
 
     public function download(Request $request): BinaryFileResponse

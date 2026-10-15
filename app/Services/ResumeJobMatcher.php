@@ -40,9 +40,11 @@ class ResumeJobMatcher
             }
 
             $matchedWeight = 0;
+            $matchedTerms = [];
             foreach ($weights as $term => $weight) {
                 if (isset($resumeTerms[$term])) {
                     $matchedWeight += $weight;
+                    $matchedTerms[] = $term;
                 }
             }
 
@@ -57,6 +59,7 @@ class ResumeJobMatcher
                 'skill_score' => $score,
                 'experience_score' => 0,
                 'education_score' => 0,
+                'matched_terms' => $matchedTerms,
             ];
         }
 

@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/** @property CarbonImmutable|null $applied_at */
 class JobApplication extends Model
 {
+    /** @var list<string> */
+    protected $hidden = ['resume_path'];
+
     protected $table = 'job_applications';
 
     /** @var list<string> */

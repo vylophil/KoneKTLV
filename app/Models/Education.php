@@ -2,9 +2,14 @@
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property CarbonImmutable $start_date
+ * @property CarbonImmutable|null $end_date
+ */
 class Education extends Model
 {
     protected $table = 'education';

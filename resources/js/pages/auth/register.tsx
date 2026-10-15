@@ -1,4 +1,5 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
+import { Field, Portal } from '@/components/portal';
 
 export default function Register() {
     const form = useForm({
@@ -7,154 +8,89 @@ export default function Register() {
         password: '',
         password_confirmation: '',
     });
-
     return (
-        <>
-            <Head title="Create an account" />
-            <main className="flex min-h-screen items-center justify-center bg-[#f5f6f0] px-6 py-12 text-[#17251e]">
-                <section className="w-full max-w-md">
-                    <Link
-                        className="text-2xl font-semibold"
-                        href="/"
-                        aria-label="KoneKT home"
-                    >
-                        Kone<span className="text-[#e45e42]">K</span>T
+        <Portal title="Create an account">
+            <section className="kt-auth">
+                <h1>Your next move starts here</h1>
+                <p>
+                    Create a job-seeker account to save roles, find resume
+                    matches, and track applications.
+                </p>
+                <form
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        form.post('/register', {
+                            onFinish: () =>
+                                form.reset('password', 'password_confirmation'),
+                        });
+                    }}
+                >
+                    <Field
+                        id="name"
+                        label="Full name"
+                        autoComplete="name"
+                        maxLength={255}
+                        required
+                        value={form.data.name}
+                        error={form.errors.name}
+                        onChange={(event) =>
+                            form.setData('name', event.target.value)
+                        }
+                    />
+                    <Field
+                        id="email"
+                        label="Email address"
+                        type="email"
+                        autoComplete="email"
+                        required
+                        value={form.data.email}
+                        error={form.errors.email}
+                        onChange={(event) =>
+                            form.setData('email', event.target.value)
+                        }
+                    />
+                    <Field
+                        id="password"
+                        label="Password (at least 8 characters)"
+                        type="password"
+                        autoComplete="new-password"
+                        required
+                        minLength={8}
+                        value={form.data.password}
+                        error={form.errors.password}
+                        onChange={(event) =>
+                            form.setData('password', event.target.value)
+                        }
+                    />
+                    <Field
+                        id="password-confirmation"
+                        label="Confirm password"
+                        type="password"
+                        autoComplete="new-password"
+                        required
+                        minLength={8}
+                        value={form.data.password_confirmation}
+                        error={form.errors.password_confirmation}
+                        onChange={(event) =>
+                            form.setData(
+                                'password_confirmation',
+                                event.target.value,
+                            )
+                        }
+                    />
+                    <button className="kt-button" disabled={form.processing}>
+                        {form.processing
+                            ? 'Creating account…'
+                            : 'Create account'}
+                    </button>
+                </form>
+                <p className="kt-meta mt-6">
+                    Already registered?{' '}
+                    <Link href="/login" className="kt-text-link">
+                        Sign in
                     </Link>
-                    <h1 className="mt-10 text-3xl font-semibold tracking-tight">
-                        Create your account
-                    </h1>
-                    <p className="mt-2 text-sm text-[#52635a]">
-                        Join KoneKT and keep your next move close.
-                    </p>
-
-                    <form
-                        className="mt-8 space-y-5"
-                        onSubmit={(event) => {
-                            event.preventDefault();
-                            form.post('/register');
-                        }}
-                    >
-                        <div>
-                            <label
-                                className="mb-2 block text-sm font-medium"
-                                htmlFor="name"
-                            >
-                                Full name
-                            </label>
-                            <input
-                                id="name"
-                                autoComplete="name"
-                                required
-                                value={form.data.name}
-                                onChange={(event) =>
-                                    form.setData('name', event.target.value)
-                                }
-                                className="min-h-12 w-full border border-[#cbd5cb] bg-white px-4 outline-none focus:border-[#24543f]"
-                            />
-                            {form.errors.name && (
-                                <p className="mt-2 text-sm text-[#a6382a]">
-                                    {form.errors.name}
-                                </p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label
-                                className="mb-2 block text-sm font-medium"
-                                htmlFor="email"
-                            >
-                                Email address
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                value={form.data.email}
-                                onChange={(event) =>
-                                    form.setData('email', event.target.value)
-                                }
-                                className="min-h-12 w-full border border-[#cbd5cb] bg-white px-4 outline-none focus:border-[#24543f]"
-                            />
-                            {form.errors.email && (
-                                <p className="mt-2 text-sm text-[#a6382a]">
-                                    {form.errors.email}
-                                </p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label
-                                className="mb-2 block text-sm font-medium"
-                                htmlFor="password"
-                            >
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                type="password"
-                                autoComplete="new-password"
-                                minLength={8}
-                                required
-                                value={form.data.password}
-                                onChange={(event) =>
-                                    form.setData('password', event.target.value)
-                                }
-                                className="min-h-12 w-full border border-[#cbd5cb] bg-white px-4 outline-none focus:border-[#24543f]"
-                            />
-                            {form.errors.password && (
-                                <p className="mt-2 text-sm text-[#a6382a]">
-                                    {form.errors.password}
-                                </p>
-                            )}
-                        </div>
-
-                        <div>
-                            <label
-                                className="mb-2 block text-sm font-medium"
-                                htmlFor="password_confirmation"
-                            >
-                                Confirm password
-                            </label>
-                            <input
-                                id="password_confirmation"
-                                type="password"
-                                autoComplete="new-password"
-                                minLength={8}
-                                required
-                                value={form.data.password_confirmation}
-                                onChange={(event) =>
-                                    form.setData(
-                                        'password_confirmation',
-                                        event.target.value,
-                                    )
-                                }
-                                className="min-h-12 w-full border border-[#cbd5cb] bg-white px-4 outline-none focus:border-[#24543f]"
-                            />
-                        </div>
-
-                        <button
-                            className="min-h-12 w-full bg-[#183b2d] px-5 font-semibold text-white transition-colors hover:bg-[#24543f] disabled:opacity-60"
-                            type="submit"
-                            disabled={form.processing}
-                        >
-                            {form.processing
-                                ? 'Creating account...'
-                                : 'Create account'}
-                        </button>
-                    </form>
-
-                    <p className="mt-6 text-sm text-[#52635a]">
-                        Already have an account?{' '}
-                        <Link
-                            className="font-semibold text-[#183b2d] underline underline-offset-2"
-                            href="/login"
-                        >
-                            Sign in
-                        </Link>
-                    </p>
-                </section>
-            </main>
-        </>
+                </p>
+            </section>
+        </Portal>
     );
 }

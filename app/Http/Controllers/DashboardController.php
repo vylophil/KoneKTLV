@@ -64,7 +64,7 @@ class DashboardController extends Controller
             'skills' => $skills
                 ->map(fn (Skill $skill): array => [
                     'name' => $skill->name,
-                    'proficiency' => $skill->pivot->proficiency_level,
+                    'proficiency' => $skill->pivot->getAttribute('proficiency_level'),
                 ]),
             'experience' => $experience
                 ->map(fn (Experience $item): array => [
@@ -72,7 +72,7 @@ class DashboardController extends Controller
                     'company' => $item->company_name,
                     'jobTitle' => $item->job_title,
                     'location' => $item->location,
-                    'startDate' => $item->start_date?->format('M Y'),
+                    'startDate' => $item->start_date->format('M Y'),
                     'endDate' => $item->is_current ? 'Present' : $item->end_date?->format('M Y'),
                     'description' => $item->description,
                 ]),
@@ -82,7 +82,7 @@ class DashboardController extends Controller
                     'institution' => $item->institution,
                     'degree' => str($item->degree)->replace('_', ' ')->title()->toString(),
                     'fieldOfStudy' => $item->field_of_study,
-                    'startDate' => $item->start_date?->format('Y'),
+                    'startDate' => $item->start_date->format('Y'),
                     'endDate' => $item->is_current ? 'Present' : $item->end_date?->format('Y'),
                     'grade' => $item->grade,
                 ]),
