@@ -504,6 +504,47 @@ textarea::placeholder {
     max-width: 440px;
     margin: 20px auto;
 }
+.kt-access-card {
+    padding: 24px;
+    border: 1px solid var(--kt-line);
+    border-radius: 8px;
+    background: white;
+}
+.kt-access-card h2 {
+    font-weight: 600;
+    font-size: 18px;
+}
+.kt-access-card > p {
+    margin-top: 8px;
+    color: var(--kt-muted);
+    line-height: 1.7;
+}
+.kt-access-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--kt-line);
+}
+.kt-access-controls {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+.kt-access-controls select {
+    min-width: 180px;
+}
+@media (max-width: 760px) {
+    .kt-access-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .kt-access-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
 .kt-auth form {
     display: grid;
     gap: 22px;

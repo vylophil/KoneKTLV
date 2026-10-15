@@ -71,6 +71,15 @@ reference, and are not automatically connected to the application.
 
 - [Backend resource contract](docs/activity-3-backend.md)
 - [Job-seeker web flow](docs/job-seeker-flow.md)
+- [Activity 5 authentication and access control](docs/activity-5-auth-access-control.md)
+
+Activity 5 adds a staff skill catalog at `/staff/skills` for Admins and Managers,
+and user role assignment at `/admin/users` for Admins. Run `php artisan db:seed`
+to seed the default Spatie permissions and assign User to existing unassigned
+accounts. Local demo staff accounts are `admin@example.com` and
+`manager@example.com`, both with password `password`; they are never created in
+production. New registrations receive User access only. Staff links appear only
+when the authenticated account has the required role and permission.
 
 Existing `/backend` JSON resources retain session authentication, CSRF protection,
 validation, and ownership rules. The new web forms reuse those resource validators

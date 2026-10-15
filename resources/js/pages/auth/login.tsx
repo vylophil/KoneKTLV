@@ -20,6 +20,7 @@ export default function Login({ status }: { status?: string }) {
                     onSubmit={(event) => {
                         event.preventDefault();
                         form.post('/login', {
+                            replace: true,
                             onFinish: () => form.reset('password'),
                         });
                     }}

@@ -22,6 +22,11 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        $this->call([SkillSeeder::class, DemoJobSeeder::class]);
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+            SkillSeeder::class,
+            DemoJobSeeder::class,
+            ActivityFiveDemoSeeder::class,
+        ]);
     }
 }

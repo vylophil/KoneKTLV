@@ -3,7 +3,7 @@
 use App\Http\Middleware\AuthenticateBackend;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(AuthenticateBackend::class)->prefix('backend')->name('backend.')->group(function (): void {
+Route::middleware([AuthenticateBackend::class, 'active'])->prefix('backend')->name('backend.')->group(function (): void {
     require __DIR__.'/skills.php';
     require __DIR__.'/profiles.php';
     require __DIR__.'/user-skills.php';

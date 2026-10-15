@@ -20,6 +20,7 @@ export default function Register() {
                     onSubmit={(event) => {
                         event.preventDefault();
                         form.post('/register', {
+                            replace: true,
                             onFinish: () =>
                                 form.reset('password', 'password_confirmation'),
                         });

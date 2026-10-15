@@ -16,7 +16,7 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/jobs', [JobsPageController::class, 'index'])->name('jobs.index');
 Route::get('/jobs/{job}', [JobsPageController::class, 'show'])->whereNumber('job')->name('jobs.show');
 
-Route::middleware('auth')->group(function (): void {
+Route::middleware(['auth', 'active'])->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::post('/jobs/{job}/apply', [JobsPageController::class, 'apply'])->middleware('throttle:20,1')->name('jobs.apply');
     Route::get('/jobs/{job}/apply', fn (JobPosting $job) => redirect('/jobs/'.$job->id.'#apply'))->name('jobs.apply.start');
@@ -41,3 +41,4 @@ Route::middleware('auth')->group(function (): void {
 });
 
 require __DIR__.'/backend.php';
+require __DIR__.'/access-control.php';

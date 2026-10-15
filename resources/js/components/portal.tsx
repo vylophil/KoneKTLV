@@ -1,8 +1,9 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { InputHTMLAttributes, ReactNode } from 'react';
+import type { Auth } from '@/types';
 
 type Shared = {
-    auth: { user: { name: string; email: string; role: string } | null };
+    auth: Auth;
     flash: { success?: string };
 };
 const destinations = [
@@ -24,9 +25,22 @@ export function Portal({
     const { props, url } = usePage<Shared>();
     const logout = useForm({});
     const member = props.auth.user;
+    const staffLinks: [string, string][] = [];
+    if (
+        props.auth.roles.some((role) => ['Admin', 'Manager'].includes(role)) &&
+        props.auth.permissions.includes('manage skills')
+    ) {
+        staffLinks.push(['/staff/skills', 'Skill catalog']);
+    }
+    if (
+        props.auth.roles.includes('Admin') &&
+        props.auth.permissions.includes('manage user roles')
+    ) {
+        staffLinks.push(['/admin/users', 'User access']);
+    }
     const links = (
         member
-            ? destinations
+            ? [...destinations, ...staffLinks]
             : [
                   ['/jobs', 'Find jobs'],
                   ['/login', 'Sign in'],
@@ -67,7 +81,7 @@ export function Portal({
                         <form
                             onSubmit={(event) => {
                                 event.preventDefault();
-                                logout.post('/logout');
+                                logout.post('/logout', { replace: true });
                             }}
                         >
                             <button

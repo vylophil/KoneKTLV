@@ -2,6 +2,11 @@
 
 return [
 
+    // Rotate encrypted page history whenever authentication changes.
+    'history' => [
+        'encrypt' => true,
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Server Side Rendering

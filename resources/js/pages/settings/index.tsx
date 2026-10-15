@@ -32,7 +32,7 @@ export default function Settings({ email }: { email: string }) {
                                     'Permanently delete your account and all related data?',
                                 )
                             )
-                                form.delete('/account');
+                                form.delete('/account', { replace: true });
                         }}
                     >
                         <Field
