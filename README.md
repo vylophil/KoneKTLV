@@ -29,6 +29,21 @@ in a second terminal. On Linux/macOS use `npm` rather than `npm.cmd`.
 When updating an existing checkout, run `composer install`, `php artisan migrate`,
 and `npm.cmd run build`. Preserve your existing `.env` and application key.
 
+## Project-local PHP on Windows
+
+This checkout includes an ignored `.tools/php` runtime. In each PowerShell terminal,
+activate it before Composer, Artisan, or a frontend build:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+. .\scripts\activate.ps1
+php -v # Must report PHP 8.3 or newer.
+```
+
+If `.tools/php` is absent, install PHP 8.3+ and ensure its directory precedes
+XAMPP PHP in your PATH. The Composer platform setting does not upgrade PHP.
+Run `composer check-platform-reqs --lock` to check the actual runtime.
+
 ## Local test account
 
 | Field    | Value              |

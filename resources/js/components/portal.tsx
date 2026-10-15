@@ -1,6 +1,7 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { InputHTMLAttributes, ReactNode } from 'react';
 import type { Auth } from '@/types';
+import { Brand, ArrowIcon } from '@/components/brand';
 
 type Shared = {
     auth: Auth;
@@ -25,6 +26,11 @@ export function Portal({
     const { props, url } = usePage<Shared>();
     const logout = useForm({});
     const member = props.auth.user;
+    const isAuth =
+        !member &&
+        ['/login', '/register', '/forgot-password', '/reset-password'].some(
+            (path) => url.split('?')[0].startsWith(path),
+        );
     const staffLinks: [string, string][] = [];
     if (
         props.auth.roles.some((role) => ['Admin', 'Manager'].includes(role)) &&
@@ -51,13 +57,22 @@ export function Portal({
             key={href}
             href={href}
             className="kt-nav-link"
-            aria-current={url.split('?')[0] === href ? 'page' : undefined}
+            aria-current={
+                (
+                    href === '/jobs'
+                        ? url.split('?')[0].startsWith('/jobs')
+                        : url.split('?')[0] === href
+                )
+                    ? 'page'
+                    : undefined
+            }
         >
+            <span className="kt-nav-marker" aria-hidden="true" />
             {label}
         </Link>
     ));
     return (
-        <>
+        <div className={member ? 'kt-shell kt-member' : 'kt-shell'}>
             <Head title={title} />
             <a className="kt-skip" href="#main">
                 Skip to content
@@ -69,7 +84,7 @@ export function Portal({
                         className="kt-logo"
                         aria-label="KoneKT home"
                     >
-                        Kone<span>K</span>T
+                        <Brand />
                     </Link>
                     <nav
                         aria-label="Main navigation"
@@ -77,6 +92,26 @@ export function Portal({
                     >
                         {links}
                     </nav>
+                    {member && (
+                        <div className="kt-member-summary">
+                            <span className="kt-avatar" aria-hidden="true">
+                                {member.name
+                                    .split(' ')
+                                    .map((part) => part[0])
+                                    .slice(0, 2)
+                                    .join('')}
+                            </span>
+                            <div>
+                                <span>{member.name}</span>
+                                <small>
+                                    {member.role?.replaceAll('_', ' ')}
+                                </small>
+                            </div>
+                            <Link href="/settings" className="kt-settings-link">
+                                Settings
+                            </Link>
+                        </div>
+                    )}
                     {member && (
                         <form
                             onSubmit={(event) => {
@@ -112,13 +147,30 @@ export function Portal({
                         {props.flash.success}
                     </p>
                 )}
-                {children}
+                {isAuth ? (
+                    <div className="kt-auth-layout">
+                        {children}
+                        <aside className="kt-auth-story">
+                            <h2>Good work starts with a connection.</h2>
+                            <p>
+                                Discover roles that fit your experience, find
+                                matches from your resume, and keep your
+                                applications in one place.
+                            </p>
+                            <Link href="/jobs" className="kt-auth-explore">
+                                Explore open roles <ArrowIcon />
+                            </Link>
+                        </aside>
+                    </div>
+                ) : (
+                    children
+                )}
             </main>
             <footer className="kt-footer">
                 <span>KoneKT · Your next move, with purpose.</span>
                 {member && <Link href="/settings">Account settings</Link>}
             </footer>
-        </>
+        </div>
     );
 }
 
@@ -261,9 +313,17 @@ export function JobRow({
     return (
         <article className="kt-job-row">
             <div className="kt-job-main">
-                <p className="kt-meta">
-                    {job.company} · {job.location}
-                </p>
+                <div className="kt-company-identity">
+                    <span className="kt-company-mark" aria-hidden="true">
+                        {job.company
+                            .split(' ')
+                            .map((part) => part[0])
+                            .slice(0, 2)
+                            .join('')}
+                    </span>
+                    <p className="kt-meta">{job.company}</p>
+                </div>
+                <p className="kt-meta">{job.location}</p>
                 <h2>
                     <Link href={`/jobs/${job.id}${query}`}>{job.title}</Link>
                 </h2>
@@ -277,7 +337,7 @@ export function JobRow({
             <div className="kt-job-actions">
                 {children}
                 <Link className="kt-text-link" href={`/jobs/${job.id}${query}`}>
-                    View role <span aria-hidden="true">→</span>
+                    View role <ArrowIcon />
                 </Link>
             </div>
         </article>
