@@ -11,6 +11,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+/.tools
 .env
 .env.backup
 .env.production
@@ -27,6 +28,9 @@ yarn-error.log
 /.vscode
 /.zed
 /.agents
+/.codex
+/.codegraph
+/CODEBASE_ANALYSIS.md
 /.amp
 /.claude
 /.cursor
