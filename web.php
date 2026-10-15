@@ -18,6 +18,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/networking-chat', function () {
         $users = User::where('id', '!=', Auth::id())->get();
+
         return view('chat.index', compact('users'));
     })->name('networking.chat');
 });

@@ -151,7 +151,9 @@ export function JobBrowser({ jobs, search }: JobBrowserProps) {
                                 className="min-h-10 border border-[#cbd5cb] bg-[#fbfcf9] px-3 text-sm text-[#17251e] focus:border-[#24543f] focus:outline-none"
                                 value={sortOrder}
                                 onChange={(event) =>
-                                    setSortOrder(event.target.value as SortOrder)
+                                    setSortOrder(
+                                        event.target.value as SortOrder,
+                                    )
                                 }
                             >
                                 <option>Newest</option>
@@ -182,7 +184,11 @@ export function JobBrowser({ jobs, search }: JobBrowserProps) {
                     {hasFilters && <p>Filtered from your current search</p>}
                 </div>
 
-                <JobResults jobs={displayedJobs} totalJobs={jobs.length} search={search} />
+                <JobResults
+                    jobs={displayedJobs}
+                    totalJobs={jobs.length}
+                    search={search}
+                />
             </div>
         </section>
     );
@@ -221,7 +227,8 @@ function getEmptyState(totalJobs: number, search: string) {
     if (totalJobs > 0) {
         return {
             title: 'No roles match these filters.',
-            description: 'Change or clear the selected filters to see more roles.',
+            description:
+                'Change or clear the selected filters to see more roles.',
         };
     }
 
@@ -234,7 +241,8 @@ function getEmptyState(totalJobs: number, search: string) {
 
     return {
         title: 'No open roles yet.',
-        description: 'Check back soon as employers add opportunities to KoneKT.',
+        description:
+            'Check back soon as employers add opportunities to KoneKT.',
     };
 }
 
@@ -281,14 +289,14 @@ function JobCard({ job }: Readonly<{ job: PublicJob }>) {
             >
                 <div>
                     <h4 className="text-sm font-semibold">Responsibilities</h4>
-                    <p className="mt-2 whitespace-pre-line text-sm leading-6 text-[#52635a]">
+                    <p className="mt-2 text-sm leading-6 whitespace-pre-line text-[#52635a]">
                         {job.responsibilities ||
                             'Details will be provided by the employer.'}
                     </p>
                 </div>
                 <div>
                     <h4 className="text-sm font-semibold">Requirements</h4>
-                    <p className="mt-2 whitespace-pre-line text-sm leading-6 text-[#52635a]">
+                    <p className="mt-2 text-sm leading-6 whitespace-pre-line text-[#52635a]">
                         {job.requirements ||
                             'Details will be provided by the employer.'}
                     </p>

@@ -122,16 +122,20 @@ export default function Dashboard({
                         >
                             Browse jobs
                         </Link>
-                        <a href="/networking-chat" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white border border-slate-200 px-5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all ml-2">
-    Network Chat
-</a>
-
+                        <a
+                            href="/networking-chat"
+                            className="ml-2 inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50"
+                        >
+                            Network Chat
+                        </a>
                     </div>
 
                     <section className="grid gap-8 border-b border-[#dce2d9] py-8 md:grid-cols-2 md:items-center">
                         <div>
                             <div className="flex items-center justify-between gap-3">
-                                <h2 className="font-semibold">Profile completion</h2>
+                                <h2 className="font-semibold">
+                                    Profile completion
+                                </h2>
                                 <p className="text-sm font-semibold text-[#183b2d]">
                                     {profileCompletion}%
                                 </p>
@@ -149,9 +153,18 @@ export default function Dashboard({
                         </div>
 
                         <dl className="grid grid-cols-3 divide-x divide-[#dce2d9] border-y border-[#dce2d9] py-4 text-center">
-                            <Metric label="Applications" value={stats.applications} />
-                            <Metric label="Saved jobs" value={stats.savedJobs} />
-                            <Metric label="Resume matches" value={stats.matches} />
+                            <Metric
+                                label="Applications"
+                                value={stats.applications}
+                            />
+                            <Metric
+                                label="Saved jobs"
+                                value={stats.savedJobs}
+                            />
+                            <Metric
+                                label="Resume matches"
+                                value={stats.matches}
+                            />
                         </dl>
                     </section>
 
@@ -169,31 +182,56 @@ export default function Dashboard({
                                 {profile ? (
                                     <>
                                         <h3 className="mt-6 text-lg font-semibold">
-                                            {profile.headline || 'Add a professional headline'}
+                                            {profile.headline ||
+                                                'Add a professional headline'}
                                         </h3>
-                                        <p className="mt-2 max-w-3xl whitespace-pre-line text-sm leading-6 text-[#52635a]">
-                                            {profile.bio || 'A short professional summary will help employers get to know you.'}
+                                        <p className="mt-2 max-w-3xl text-sm leading-6 whitespace-pre-line text-[#52635a]">
+                                            {profile.bio ||
+                                                'A short professional summary will help employers get to know you.'}
                                         </p>
                                         <dl className="mt-6 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-                                            <Detail label="Location" value={profile.location} />
-                                            <Detail label="Phone" value={profile.phone} />
-                                            <Detail label="Industry" value={profile.industry} />
+                                            <Detail
+                                                label="Location"
+                                                value={profile.location}
+                                            />
+                                            <Detail
+                                                label="Phone"
+                                                value={profile.phone}
+                                            />
+                                            <Detail
+                                                label="Industry"
+                                                value={profile.industry}
+                                            />
                                             <Detail
                                                 label="Experience"
                                                 value={
-                                                    profile.yearsOfExperience === null
+                                                    profile.yearsOfExperience ===
+                                                    null
                                                         ? null
                                                         : `${profile.yearsOfExperience} years`
                                                 }
                                             />
-                                            <Detail label="Website" value={profile.website} link />
-                                            <Detail label="LinkedIn" value={profile.linkedinUrl} link />
-                                            <Detail label="GitHub" value={profile.githubUrl} link />
+                                            <Detail
+                                                label="Website"
+                                                value={profile.website}
+                                                link
+                                            />
+                                            <Detail
+                                                label="LinkedIn"
+                                                value={profile.linkedinUrl}
+                                                link
+                                            />
+                                            <Detail
+                                                label="GitHub"
+                                                value={profile.githubUrl}
+                                                link
+                                            />
                                         </dl>
                                     </>
                                 ) : (
                                     <p className="mt-5 text-sm leading-6 text-[#52635a]">
-                                        Your profile details have not been added yet.
+                                        Your profile details have not been added
+                                        yet.
                                     </p>
                                 )}
                             </section>
@@ -210,17 +248,27 @@ export default function Dashboard({
                                 {experience.length > 0 ? (
                                     <div className="mt-5 divide-y divide-[#e4e9e2]">
                                         {experience.map((item) => (
-                                            <article className="py-5 first:pt-0" key={item.id}>
-                                                <h3 className="font-semibold">{item.jobTitle}</h3>
+                                            <article
+                                                className="py-5 first:pt-0"
+                                                key={item.id}
+                                            >
+                                                <h3 className="font-semibold">
+                                                    {item.jobTitle}
+                                                </h3>
                                                 <p className="mt-1 text-sm text-[#52635a]">
                                                     {item.company}
-                                                    {item.location ? ` · ${item.location}` : ''}
+                                                    {item.location
+                                                        ? ` · ${item.location}`
+                                                        : ''}
                                                 </p>
                                                 <p className="mt-1 text-xs text-[#718078]">
-                                                    {item.startDate || 'Start date not set'} – {item.endDate || 'Present'}
+                                                    {item.startDate ||
+                                                        'Start date not set'}{' '}
+                                                    –{' '}
+                                                    {item.endDate || 'Present'}
                                                 </p>
                                                 {item.description && (
-                                                    <p className="mt-3 whitespace-pre-line text-sm leading-6 text-[#52635a]">
+                                                    <p className="mt-3 text-sm leading-6 whitespace-pre-line text-[#52635a]">
                                                         {item.description}
                                                     </p>
                                                 )}
@@ -246,14 +294,24 @@ export default function Dashboard({
                                 {education.length > 0 ? (
                                     <div className="mt-5 divide-y divide-[#e4e9e2]">
                                         {education.map((item) => (
-                                            <article className="py-5 first:pt-0" key={item.id}>
-                                                <h3 className="font-semibold">{item.institution}</h3>
+                                            <article
+                                                className="py-5 first:pt-0"
+                                                key={item.id}
+                                            >
+                                                <h3 className="font-semibold">
+                                                    {item.institution}
+                                                </h3>
                                                 <p className="mt-1 text-sm text-[#52635a]">
                                                     {item.degree}
-                                                    {item.fieldOfStudy ? ` · ${item.fieldOfStudy}` : ''}
+                                                    {item.fieldOfStudy
+                                                        ? ` · ${item.fieldOfStudy}`
+                                                        : ''}
                                                 </p>
                                                 <p className="mt-1 text-xs text-[#718078]">
-                                                    {item.startDate || 'Start year not set'} – {item.endDate || 'Present'}
+                                                    {item.startDate ||
+                                                        'Start year not set'}{' '}
+                                                    –{' '}
+                                                    {item.endDate || 'Present'}
                                                 </p>
                                                 {item.grade && (
                                                     <p className="mt-2 text-sm text-[#52635a]">
@@ -286,7 +344,9 @@ export default function Dashboard({
                                 </div>
                                 {resume ? (
                                     <div className="mt-5 border-l-2 border-[#e45e42] bg-[#e7eee5] px-4 py-4">
-                                        <p className="break-all font-medium">{resume.name}</p>
+                                        <p className="font-medium break-all">
+                                            {resume.name}
+                                        </p>
                                         <a
                                             className="mt-3 inline-flex text-sm font-semibold text-[#183b2d] underline underline-offset-2"
                                             href={resume.downloadUrl}
@@ -296,7 +356,8 @@ export default function Dashboard({
                                     </div>
                                 ) : (
                                     <p className="mt-5 text-sm leading-6 text-[#52635a]">
-                                        Add a text-based PDF to get job suggestions matched to your experience.
+                                        Add a text-based PDF to get job
+                                        suggestions matched to your experience.
                                     </p>
                                 )}
                             </section>
@@ -317,16 +378,20 @@ export default function Dashboard({
                                                 className="flex items-center justify-between gap-3 py-3 first:pt-0"
                                                 key={skill.name}
                                             >
-                                                <span className="font-medium">{skill.name}</span>
-                                                <span className="text-sm capitalize text-[#52635a]">
-                                                    {skill.proficiency || 'Level not set'}
+                                                <span className="font-medium">
+                                                    {skill.name}
+                                                </span>
+                                                <span className="text-sm text-[#52635a] capitalize">
+                                                    {skill.proficiency ||
+                                                        'Level not set'}
                                                 </span>
                                             </li>
                                         ))}
                                     </ul>
                                 ) : (
                                     <p className="mt-5 text-sm leading-6 text-[#52635a]">
-                                        Add skills to help your resume matches find relevant roles.
+                                        Add skills to help your resume matches
+                                        find relevant roles.
                                     </p>
                                 )}
                             </section>
@@ -390,7 +455,8 @@ export default function Dashboard({
                                         type="submit"
                                         disabled={
                                             deleteAccount.processing ||
-                                            deleteAccount.data.username !== user.email
+                                            deleteAccount.data.username !==
+                                                user.email
                                         }
                                     >
                                         {deleteAccount.processing
@@ -424,7 +490,7 @@ function Detail({
     return (
         <div>
             <dt className="text-xs font-semibold text-[#52635a]">{label}</dt>
-            <dd className="mt-1 break-words text-sm">
+            <dd className="mt-1 text-sm break-words">
                 {value && link ? (
                     <a
                         className="text-[#183b2d] underline underline-offset-2"
