@@ -3,6 +3,10 @@
 A Laravel 13, React 19, and Inertia 3 job portal with dedicated screens for job
 discovery, resume matches, profiles, saved jobs, and applications.
 
+For teammate installation and testing of this job-search-only branch, follow
+[Run the Philippine job-search branch](docs/jsearch-setup.md). OmniRoute and AI
+credentials are not required for this branch.
+
 ## Local setup
 
 Install PHP 8.3+, Composer 2, and Node 22.12+. PHP needs Laravel's standard
