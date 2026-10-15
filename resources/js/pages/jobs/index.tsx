@@ -57,8 +57,8 @@ export default function JobsIndex({ jobs, search }: JobsIndexProps) {
                                 Find work that moves you forward.
                             </h1>
                             <p className="mt-6 max-w-xl text-lg leading-8 text-[#52635a]">
-                                Discover roles that fit your experience and
-                                meet the people who can help you grow.
+                                Discover roles that fit your experience and meet
+                                the people who can help you grow.
                             </p>
                             <a
                                 className="mt-8 inline-flex items-center rounded-sm bg-[#e45e42] px-5 py-3 font-semibold text-white transition-colors hover:bg-[#c94e36]"
@@ -154,7 +154,8 @@ export default function JobsIndex({ jobs, search }: JobsIndexProps) {
                                                     {job.title}
                                                 </h3>
                                                 <p className="mt-1 text-sm text-[#52635a]">
-                                                    {job.company} · {job.location}
+                                                    {job.company} ·{' '}
+                                                    {job.location}
                                                 </p>
                                             </div>
                                             <span className="border border-[#d6dfd5] px-3 py-1.5 text-sm text-[#496454]">

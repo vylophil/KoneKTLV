@@ -3,9 +3,7 @@ import type { ComponentType } from 'react';
 import { createRoot } from 'react-dom/client';
 
 const appName = 'KoneKT';
-const pages = import.meta.glob<{ default: ComponentType }>(
-    './pages/**/*.tsx',
-);
+const pages = import.meta.glob<{ default: ComponentType }>('./pages/**/*.tsx');
 
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
