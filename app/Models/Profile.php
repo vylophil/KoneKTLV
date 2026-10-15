@@ -16,6 +16,8 @@ class Profile extends Model
         'website',
         'avatar_url',
         'resume_url',
+        'resume_path',
+        'resume_original_name',
         'linkedin_url',
         'github_url',
         'industry',
